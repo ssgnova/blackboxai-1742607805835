@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Daily Habit Builder</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        .habit-card {
+            transition: transform 0.2s ease-in-out;
+        }
+        .habit-card:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header/Navigation -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-check-circle text-indigo-600 text-2xl"></i>
+                <h1 class="text-xl font-semibold text-gray-800">Daily Habit Builder</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span class="text-gray-600">
+                    <i class="fas fa-user-circle mr-2"></i>
+                    <span id="userName">User</span>
+                </span>
+                <a href="index.html" class="text-gray-600 hover:text-indigo-600">
+                    <i class="fas fa-sign-out-alt"></i>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Add New Habit Form -->
+        <div class="max-w-2xl mx-auto mb-12 bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-2xl font-semibold mb-6 text-gray-800">Add New Habit</h2>
+            <form id="habitForm" class="space-y-4">
+                <div>
+                    <label for="habitTitle" class="block text-sm font-medium text-gray-700 mb-1">Habit Title</label>
+                    <input type="text" id="habitTitle" name="habitTitle" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        placeholder="e.g., Morning Exercise">
+                </div>
+                <div>
+                    <label for="habitDescription" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea id="habitDescription" name="habitDescription" rows="3"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        placeholder="Describe your habit..."></textarea>
+                </div>
+                <div>
+                    <label for="habitFrequency" class="block text-sm font-medium text-gray-700 mb-1">Frequency</label>
+                    <select id="habitFrequency" name="habitFrequency" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                    </select>
+                </div>
+                <button type="submit"
+                    class="w-full bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition duration-300 flex items-center justify-center">
+                    <i class="fas fa-plus mr-2"></i>
+                    Add Habit
+                </button>
+            </form>
+        </div>
+
+        <!-- Habits List -->
+        <div class="max-w-4xl mx-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-semibold text-gray-800">Your Habits</h2>
+                <div class="flex space-x-2">
+                    <button id="sortButton" class="text-gray-600 hover:text-indigo-600">
+                        <i class="fas fa-sort-alpha-down"></i>
+                    </button>
+                    <button id="filterButton" class="text-gray-600 hover:text-indigo-600">
+                        <i class="fas fa-filter"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Habits Grid -->
+            <div id="habitsContainer" class="grid md:grid-cols-2 gap-6">
+                <!-- Habit cards will be dynamically inserted here -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="text-center py-12 hidden">
+                <i class="fas fa-clipboard-list text-4xl text-gray-400 mb-4"></i>
+                <h3 class="text-xl font-medium text-gray-600 mb-2">No habits yet</h3>
+                <p class="text-gray-500">Start by adding a new habit above!</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-white rounded-lg shadow-lg p-4 hidden">
+        <div class="flex items-center">
+            <i id="toastIcon" class="mr-2"></i>
+            <p id="toastMessage"></p>
+        </div>
+    </div>
+
+    <!-- Modal for Editing Habit -->
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 class="text-xl font-semibold mb-4">Edit Habit</h3>
+            <form id="editHabitForm" class="space-y-4">
+                <input type="hidden" id="editHabitId">
+                <div>
+                    <label for="editHabitTitle" class="block text-sm font-medium text-gray-700 mb-1">Habit Title</label>
+                    <input type="text" id="editHabitTitle" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                </div>
+                <div>
+                    <label for="editHabitDescription" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea id="editHabitDescription" rows="3"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"></textarea>
+                </div>
+                <div>
+                    <label for="editHabitFrequency" class="block text-sm font-medium text-gray-700 mb-1">Frequency</label>
+                    <select id="editHabitFrequency" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                    </select>
+                </div>
+                <div class="flex justify-end space-x-2 pt-4">
+                    <button type="button" onclick="closeEditModal()"
+                        class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                        class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
